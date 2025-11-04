@@ -9,14 +9,54 @@
 <body>
   <main class="container">
     <h1>Lyrics → PowerPoint</h1>
-    <p class="muted">Paste your lyrics below. The app creates slides with two lines per slide on a black background with white text. Hindi and Telugu lines will use suitable fonts if available on your system.</p>
+    <p class="muted">Paste your lyrics below. The app creates slides with two lines per slide on a black background with white text.</p>
 
     <form method="post" action="/generate">
-      <label for="presentation_name">Presentation name</label>
-      <input id="presentation_name" name="presentation_name" type="text" placeholder="MyLyrics" value="MyLyrics" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="presentation_name">Presentation name</label>
+          <input id="presentation_name" name="presentation_name" type="text" placeholder="MyLyrics" value="MyLyrics" />
+        </div>
+        
+        <div class="form-group">
+          <label for="font_size">Font size (points)</label>
+          <input id="font_size" name="font_size" type="number" min="12" max="96" value="{{ default_size }}" />
+        </div>
+      </div>
 
-      <label for="lyrics">Lyrics (one line per row)</label>
-      <textarea id="lyrics" name="lyrics" rows="14" placeholder="Type or paste lyrics here...\nType DONE on a new line if you'd like to mirror the CLI flow (optional)"></textarea>
+      <div class="form-row fonts">
+        <div class="form-group">
+          <label for="font_english">English Font</label>
+          <select id="font_english" name="font_english">
+            {% for font in fonts.english %}
+            <option value="{{ font }}">{{ font }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="font_telugu">Telugu Font</label>
+          <select id="font_telugu" name="font_telugu">
+            {% for font in fonts.telugu %}
+            <option value="{{ font }}">{{ font }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="font_hindi">Hindi Font</label>
+          <select id="font_hindi" name="font_hindi">
+            {% for font in fonts.hindi %}
+            <option value="{{ font }}">{{ font }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="lyrics">Lyrics (one line per row)</label>
+        <textarea id="lyrics" name="lyrics" rows="14" placeholder="Type or paste lyrics here..."></textarea>
+      </div>
 
       <div class="actions">
         <button type="submit">Generate PPTX</button>
@@ -27,8 +67,9 @@
       <summary>Notes</summary>
       <ul>
         <li>Two lines per slide. Empty lines are kept.</li>
-        <li>Fonts used: Calibri (English), Noto Sans Devanagari (Hindi), Noto Sans Telugu (Telugu). Install these fonts for best results.</li>
         <li>The generated file will download directly.</li>
+        <li>Make sure the selected fonts are installed on your system.</li>
+        <li>Language is auto-detected per line based on the script used.</li>
       </ul>
     </details>
   </main>
