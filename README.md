@@ -19,7 +19,7 @@ python app.py
 Open http://127.0.0.1:5000 in your browser. Paste lyrics, set a name, and click Generate.
 
 ## Notes
-- Two lines per slide. Empty lines are preserved.
+- Two lines per slide. Empty lines are ignored.
 - Fonts must be installed on the machine where you open the PPT in PowerPoint:
   - English: Calibri (usually present on Windows)
   - Hindi: Noto Sans Devanagari
