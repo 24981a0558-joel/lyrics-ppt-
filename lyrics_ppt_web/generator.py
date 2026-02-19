@@ -28,7 +28,7 @@ DEFAULT_FONTS = {
 }
 
 # Enhanced styling for maximum impact
-DEFAULT_FONT_SIZE = Pt(48)  # Larger for better visibility
+DEFAULT_FONT_SIZE = Pt(42)  # Default font size in points
 TEXT_COLOR = RGBColor(255, 255, 255)  # Bright white
 BG_COLOR = RGBColor(0, 0, 0)  # Deep black for contrast
 SHADOW_COLOR = RGBColor(0, 0, 0)  # Text shadow
@@ -37,25 +37,25 @@ SHADOW_COLOR = RGBColor(0, 0, 0)  # Text shadow
 def _detect_font(line: str, fonts: Dict[str, str]) -> str:
     """Pro font selection based on language and style preferences."""
     # Always prefer bold variants of fonts for lyrics
-    
+
     if any(0x0900 <= ord(c) <= 0x097F for c in line):  # Hindi
-        font = fonts.get('hindi', DEFAULT_FONTS['hindi'][0])
+        font = fonts.get('hindi') or DEFAULT_FONTS['hindi'][0]
         # Try bold variant if not already specified
         if not any(bold in font.lower() for bold in ['bold', 'black']):
             font_bold = f"{font} Bold"
             return font_bold if font_bold in DEFAULT_FONTS['hindi'] else font
         return font
-        
+
     if any(0x0C00 <= ord(c) <= 0x0C7F for c in line):  # Telugu
-        font = fonts.get('telugu', DEFAULT_FONTS['telugu'][0])
+        font = fonts.get('telugu') or DEFAULT_FONTS['telugu'][0]
         # For Telugu, maintain readability while being bold
         if not any(bold in font.lower() for bold in ['bold', 'black']):
             font_bold = f"{font} Bold"
             return font_bold if font_bold in DEFAULT_FONTS['telugu'] else font
         return font
-    
+
     # English - prefer extra bold fonts for maximum impact
-    font = fonts.get('english', DEFAULT_FONTS['english'][0])
+    font = fonts.get('english') or DEFAULT_FONTS['english'][0]
     if not any(bold in font.lower() for bold in ['bold', 'black']):
         font_bold = f"{font} Bold"
         return font_bold if font_bold in DEFAULT_FONTS['english'] else font

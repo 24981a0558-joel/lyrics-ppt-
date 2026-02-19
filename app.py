@@ -1,9 +1,12 @@
 import io
+import logging
+import re
 from flask import Flask, render_template, request, send_file, abort, jsonify
 
-from lyrics_ppt_web.generator import generate_pptx, DEFAULT_FONTS
+from lyrics_ppt_web.generator import generate_pptx, DEFAULT_FONTS, DEFAULT_FONT_SIZE
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 
 @app.get("/")
@@ -11,37 +14,38 @@ def index():
     return render_template(
         "index.html",
         fonts=DEFAULT_FONTS,
-        default_size=42  # Matches generator.py
+        default_size=int(DEFAULT_FONT_SIZE.pt)
     )
 
 
 @app.post("/generate")
 def generate():
     presentation_name = (request.form.get("presentation_name") or "Lyrics").strip()
+    # Sanitize: keep only safe filename characters to prevent header injection / path traversal
+    presentation_name = re.sub(r'[^\w \-.]', '', presentation_name).strip() or "Lyrics"
     lyrics_text = (request.form.get("lyrics") or "").strip("\ufeff")  # strip BOM if pasted
-    
+
     # Get font preferences
     fonts = {
         'english': request.form.get("font_english"),
         'hindi': request.form.get("font_hindi"),
         'telugu': request.form.get("font_telugu")
     }
-    
-    # Debug print
-    print("Font selections:", fonts)
-    
+
+    logger.debug("Font selections: %s", fonts)
+
     try:
-        font_size = int(request.form.get("font_size", "42"))
-        print("Font size:", font_size)
+        font_size = int(request.form.get("font_size", str(int(DEFAULT_FONT_SIZE.pt))))
+        font_size = max(12, min(96, font_size))  # clamp to safe range matching UI constraints
+        logger.debug("Font size: %d", font_size)
     except (ValueError, TypeError):
-        font_size = 42
-        print("Using default font size:", font_size)
+        font_size = int(DEFAULT_FONT_SIZE.pt)
+        logger.debug("Using default font size: %d", font_size)
 
     if not lyrics_text:
         return abort(400, description="Lyrics text is required.")
 
-    # Debug print first few lines
-    print("First few lines:", lyrics_text.splitlines()[:2])
+    logger.debug("First few lines: %s", lyrics_text.splitlines()[:2])
 
     pptx_bytes, slide_count, download_name = generate_pptx(
         lyrics_text,
